@@ -31,14 +31,14 @@ export function tryOpenDeepLink(path: string) {
 
         const intentTimer = window.setTimeout(() => {
           try { window.location.href = intentUrl; } catch (_) {}
-        }, 600);
+        }, 0);
 
         const storeTimer = window.setTimeout(() => {
           try { if (!handled) window.location.href = playStore; } catch (_) {}
           document.removeEventListener('visibilitychange', onVisibilityChange);
           clearTimeout(intentTimer);
           clearTimeout(storeTimer);
-        }, 1500);
+        }, 800);
 
         return;
       }
@@ -48,18 +48,18 @@ export function tryOpenDeepLink(path: string) {
         window.location.href = intentUrl;
       } catch (e) {}
 
-      // Secondary fallback: try custom scheme after short delay
+      // Secondary fallback: try custom scheme immediately
       const schemeTimer = window.setTimeout(() => {
         try { window.location.href = schemeUrl; } catch (_) {}
-      }, 600);
+      }, 0);
 
-      // If not opened within 1.5s, go to Play Store
+      // If not opened within 800ms, go to Play Store
       const storeTimer = window.setTimeout(() => {
         try { if (!handled) window.location.href = playStore; } catch (_) {}
         document.removeEventListener('visibilitychange', onVisibilityChange);
         clearTimeout(schemeTimer);
         clearTimeout(storeTimer);
-      }, 1500);
+      }, 800);
 
       return;
     }
@@ -76,7 +76,7 @@ export function tryOpenDeepLink(path: string) {
 
     const schemeTimer = window.setTimeout(() => {
       try { window.location.href = schemeUrl; } catch (_) {}
-    }, 600);
+    }, 0);
 
     const storeTimer = window.setTimeout(() => {
       try {
@@ -87,7 +87,7 @@ export function tryOpenDeepLink(path: string) {
       document.removeEventListener('visibilitychange', onVisibilityChange);
       clearTimeout(schemeTimer);
       clearTimeout(storeTimer);
-    }, 1500);
+    }, 800);
   } catch (err) {
     // ignore
   }
@@ -116,14 +116,14 @@ export function tryOpenEventDeepLinkAndroid(id: string) {
       // ignore
     }
 
-    // fallback to Play Store if app not opened within 1.5s
+    // fallback to Play Store if app not opened within 800ms
     const storeTimer = window.setTimeout(() => {
       try {
         if (!handled) window.location.href = playStore;
       } catch (_) {}
       document.removeEventListener('visibilitychange', onVisibilityChange);
       clearTimeout(storeTimer);
-    }, 1500);
+    }, 800);
   } catch (err) {
     // ignore
   }
@@ -152,7 +152,7 @@ export function tryOpenBlogDeepLinkAndroid(id: string) {
       try { if (!handled) window.location.href = playStore; } catch (_) {}
       document.removeEventListener('visibilitychange', onVisibilityChange);
       clearTimeout(storeTimer);
-    }, 1500);
+    }, 800);
   } catch (err) {}
 }
 
@@ -179,7 +179,7 @@ export function tryOpenOrganizationDeepLinkAndroid(id: string) {
       try { if (!handled) window.location.href = playStore; } catch (_) {}
       document.removeEventListener('visibilitychange', onVisibilityChange);
       clearTimeout(storeTimer);
-    }, 1500);
+    }, 800);
   } catch (err) {}
 }
 
