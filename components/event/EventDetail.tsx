@@ -119,7 +119,7 @@ export default function EventDetail({ eventId }: Props) {
 
       const storeTimer = window.setTimeout(() => {
         try { if (!document.hidden) window.location.href = playStoreUrl; } catch (e) {}
-      }, 800);
+      }, 4000);
 
       const onVis = () => {
         if (document.hidden) {
