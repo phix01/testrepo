@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { createPortal } from "react-dom";
+import { createPortal } from "react-dom"; 
 import Image from "next/image";
 import {
   getEventDetail,
@@ -152,12 +152,12 @@ export default function EventDetail({ eventId }: Props) {
   }
 
   const priceNum = eventData?.price?.amount || 0;
-  const priceLabel = formatPrice(priceNum);
+  //const priceLabel = formatPrice(priceNum);
   const total = priceNum * qty;
 
   const isOnline = eventData?.eventType === 1;
   const eventTypeLabel = isOnline ? "Çevrim İçi" : "Yüz Yüze";
-
+/*
   async function toggleFavorite() {
     if (favorite) {
       await removeFavorite(eventId);
@@ -167,7 +167,7 @@ export default function EventDetail({ eventId }: Props) {
       setFavorite(true);
     }
   }
-
+*/
   function handleBuyClick() {
     setShowQRModal(true);
   }
@@ -183,7 +183,7 @@ export default function EventDetail({ eventId }: Props) {
       try {
         await navigator.share(shareData);
       } catch (err) {
-        console.log("Paylaşım iptal edildi veya desteklenmiyor.");
+       // console.log("Paylaşım iptal edildi veya desteklenmiyor.");
       }
     } else {
       navigator.clipboard.writeText(window.location.href);
@@ -208,7 +208,7 @@ export default function EventDetail({ eventId }: Props) {
     : "-";
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-20 pt-40">
+    <div className="bg-gray-50 min-h-screen pb-40 pt-28 md:pt-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* === ÜST KISIM: RESİM VE ANA BİLGİ KARTI YAN YANA === */}
@@ -216,11 +216,7 @@ export default function EventDetail({ eventId }: Props) {
           
           {/* SOL TARAFTAKİ RESİM */}
           <div className="lg:col-span-5 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6 flex items-center justify-center min-h-[350px]">
-            <img 
-              src={banner} 
-              alt={eventData?.name || "Etkinlik Görseli"} 
-              className="w-full h-full max-h-[450px] object-contain rounded-xl"
-            />
+            <img src={banner} alt={eventData?.name} className="w-full h-full max-h-[350px] md:max-h-[450px] object-contain rounded-xl" />
           </div>
 
           {/* SAĞ TARAFTAKİ ANA BİLGİ KARTI */}
@@ -243,28 +239,9 @@ export default function EventDetail({ eventId }: Props) {
                 )}
               </div>
               
-              {/* PAYLAŞ VE FAVORİ BUTONLARI YAN YANA */}
-              <div className="flex items-center gap-2">
-                
-                {/*
-                <button 
-                  onClick={toggleFavorite} 
-                  className={`flex items-center gap-2 px-4 py-2.5 h-10 rounded-full font-bold transition-all duration-300 ${favorite ? 'bg-pink-100 text-pink-600' : 'bg-gray-100 text-gray-500 hover:bg-pink-50 hover:text-pink-500'}`}
-                >
-                  <Heart className={`w-5 h-5 ${favorite ? 'fill-current' : ''}`} />
-                  <span className="hidden sm:block">{favorite ? "Favorilerde" : "Favoriye Al"}</span>
-                </button> 
-                */}
-                
-                <button 
-                  onClick={handleShare} 
-                  title="Paylaş"
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-500 hover:bg-orange-50 hover:text-orange-500 transition-all duration-300"
-                >
-                  <Share2 className="w-5 h-5" />
-                </button>
-
-              </div>
+             <button onClick={handleShare} title="Paylaş" className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-500 hover:bg-orange-50 hover:text-orange-500 transition-all duration-300 shrink-0">
+                <Share2 className="w-5 h-5" />
+              </button>
 
             </div>
             
@@ -318,186 +295,160 @@ export default function EventDetail({ eventId }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           
           {/* SOL TARAF: AÇIKLAMA VE KONUM */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white rounded-[2.5rem] shadow-sm p-8 md:p-10 border border-gray-100">
-              <h3 className="text-2xl font-extrabold text-gray-900 mb-6">Etkinlik Hakkında</h3>
-              <div 
-                className="prose prose-lg prose-pink max-w-none text-gray-600 leading-relaxed" 
-                dangerouslySetInnerHTML={{ __html: eventData?.description || "Bu etkinlik için açıklama girilmemiştir." }} 
-              />
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-[2.5rem] shadow-sm p-8 md:p-10 border border-gray-100 h-full">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 border-b pb-4">
+                Etkinlik Hakkında
+              </h2>
+              <div className="prose prose-base md:prose-lg prose-pink max-w-none text-gray-600 leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: eventData?.description || "Bu etkinlik için açıklama girilmemiştir." }} />
             </div>
 
             {isOnline ? (
-              <div className="bg-white rounded-[2.5rem] shadow-sm p-8 md:p-10 border border-gray-100">
+              <div className="bg-white rounded-[2.5rem] shadow-sm p-8 md:p-8 border border-gray-100">
                 <h3 className="text-2xl font-extrabold text-gray-900 mb-6">Katılım Bilgileri</h3>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                    <Video className="w-6 h-6 text-green-600" />
+                 <div className="flex flex-col gap-4">
+                  <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                    <Video className="w-7 h-7 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-lg text-gray-800 font-bold mb-1">Bu etkinlik çevrim içi (online) gerçekleştirilecektir.</p>
+                    <p className="text-lg text-gray-800 font-bold mb-2">Bu etkinlik çevrim içi (online) gerçekleştirilecektir.</p>
                     <p className="text-gray-600">Katılım bağlantısı ve detaylar, biletinizi satın aldıktan sonra e-posta adresinize gönderilecektir.</p>
                   </div>
                 </div>
               </div>
-            ) : (
-              eventData?.address && (
-                <div className="bg-white rounded-[2.5rem] shadow-sm p-8 md:p-10 border border-gray-100">
-                  <h3 className="text-2xl font-extrabold text-gray-900 mb-6">Konum</h3>
-                  <div className="flex items-start gap-4 mb-6">
-                    <MapPin className="w-6 h-6 text-orange-600 shrink-0 mt-1" />
-                    <p className="text-lg text-gray-700 font-medium leading-relaxed">{eventData.address}</p>
-                  </div>
-                  
-                  <div className="w-full h-64 md:h-80 rounded-3xl overflow-hidden border border-gray-200 shadow-inner relative">
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      loading="lazy"
-                      className="absolute inset-0"
-                      src={`https://maps.google.com/maps?q=${encodeURIComponent(eventData.address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
-                    />
-                  </div>
-                  <div className="mt-6">
-                    <a 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      href={`https://maps.google.com/maps?q=${encodeURIComponent(eventData.address)}`} 
-                      className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl font-bold transition-colors"
-                    >
-                      Google Haritalar'da Aç
-                    </a>
-                  </div>
-                </div>
-              )
-            )}
-            
-            {/* BENZER ETKİNLİKLER */}
-            {similar && similar.length > 0 && (
-              <section className="mt-24">
-                <h3 className="text-3xl font-bold text-gray-900 mb-10">Benzer Etkinlikler</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {similar.slice(0, 4).map((s: any) => (
-                    <Link key={s.id} href={`/${s.locale || "tr"}/event/${s.id}`} className="group space-y-4">
-                      <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-gray-100">
-                        <Image src={s.thumbnail || s.images?.[0] || "/placeholder.png"} alt={s.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-900 line-clamp-1 group-hover:text-pink-600 transition-colors">{s.name}</h4>
-                        <p className="text-pink-600 font-extrabold mt-1">{formatPrice(s.price?.amount)}</p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
-          </div>
+            ) : null}
+            </div>
 
-          {/* SAĞ TARAF: STICKY SATIN ALMA PANOSU */}
-          <aside className="lg:col-span-1">
-            <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 border border-gray-100 sticky top-32">
-              
-              <div className="flex justify-between items-end mb-8 border-b border-gray-100 pb-6">
-                <span className="text-gray-500 font-medium">Bilet Fiyatı</span>
-                <span className="text-4xl font-extrabold text-gray-900">{priceLabel}</span>
-              </div>
-
-              {/* YENİ HARİKA TASARIMLI TARİH SEÇİCİ (CUSTOM DROPDOWN) */}
-              {eventData?.eventDates && eventData.eventDates.length > 1 && (
-                <div className="mb-8 relative">
-                  <label className="block text-sm font-bold text-gray-700 mb-3">Tarih ve Saat Seçimi</label>
-                  
-                  {/* Seçili olanı gösteren estetik ana kutu */}
-                  <div 
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className={`w-full bg-white border-2 ${isDropdownOpen ? 'border-pink-400 ring-4 ring-pink-50' : 'border-gray-100 hover:border-pink-200'} text-gray-900 rounded-2xl p-4 flex justify-between items-center cursor-pointer shadow-sm transition-all`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-lg">
-                        {currentEventDate.day} {currentEventDate.month} {currentEventDate.year} 
-                        <span className="text-gray-500 text-base font-medium ml-1">
-                          {getDayName(currentEventDate.day, currentEventDate.month, currentEventDate.year)}
-                        </span>
-                      </span>
-                      <span className="text-sm text-pink-600 font-extrabold mt-1 flex items-center">
-                        <Clock className="w-4 h-4 mr-1.5" />
-                        {currentEventDate.startTime || "Belirtilmemiş"} {currentEventDate.endTime ? `- ${currentEventDate.endTime}` : ""}
-                      </span>
-                    </div>
-                    <ChevronDown className={`w-6 h-6 text-gray-400 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180 text-pink-500' : ''}`} />
+            {/* Sağda gösterilecek Konum kartı (aside) */}
+            <aside className="lg:col-span-1">
+              {!isOnline && eventData?.address && (
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                  <h3 className="text-xl md:text-2xl font-extrabold text-gray-900 mb-6">Konum</h3>
+                  <div className="flex items-start gap-3 mb-4">
+                    <MapPin className="w-5 h-5 text-orange-600 shrink-0 mt-1" />
+                    <p className="text-base md:text-lg text-gray-700 font-medium leading-relaxed">{eventData.address}</p>
                   </div>
 
-                  {/* Açılan Menü (Dropdown Listesi) */}
-                  {isDropdownOpen && (
-                    <>
-                      {/* Ekrana tıklandığında menüyü kapatması için görünmez katman */}
-                      <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)}></div>
-                      
-                      <div className="absolute top-[calc(100%+0.5rem)] left-0 w-full bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 max-h-72 overflow-y-auto custom-scrollbar overflow-hidden">
-                        {eventData.eventDates.map((date: any, index: number) => {
-                          const iterDayStr = getDayName(date.day, date.month, date.year);
-                          const isSelected = selectedDateIndex === index;
-                          return (
-                            <div 
-                              key={index} 
-                              onClick={() => { setSelectedDateIndex(index); setIsDropdownOpen(false); }}
-                              className={`p-4 border-b border-gray-50 last:border-0 cursor-pointer transition-all group flex items-center justify-between ${isSelected ? 'bg-pink-50/50' : 'hover:bg-gray-50'}`}
-                            >
-                              <div>
-                                <div className={`font-bold text-lg transition-colors ${isSelected ? 'text-pink-600' : 'text-gray-800 group-hover:text-pink-600'}`}>
-                                  {date.day} {date.month} {date.year} <span className="text-sm font-medium text-gray-500 ml-1">{iterDayStr}</span>
-                                </div>
-                                <div className="text-sm text-gray-500 font-bold mt-1 flex items-center">
-                                  <Clock className={`w-4 h-4 mr-1.5 ${isSelected ? 'text-pink-500' : 'text-gray-400'}`} />
-                                  {date.startTime || "Belirtilmemiş"} {date.endTime ? `- ${date.endTime}` : ""}
-                                </div>
-                              </div>
-                              {/* Özel Seçili İkonu */}
-                              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected ? 'border-pink-500 bg-pink-500' : 'border-gray-200 group-hover:border-pink-300'}`}>
-                                {isSelected && <CheckCircle2 className="w-4 h-4 text-white" />}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
+                  <div className="w-full h-40 rounded-xl overflow-hidden border border-gray-200 shadow-inner mb-4">
+                    <iframe width="100%" height="100%" frameBorder="0" loading="lazy" className="w-full h-full" src={`https://maps.google.com/maps?q=${encodeURIComponent(eventData.address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`} />
+                  </div>
+
+                  <a target="_blank" rel="noreferrer" href={`https://maps.google.com/maps?q=${encodeURIComponent(eventData.address)}`} className="inline-flex items-center justify-center w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl font-bold transition-colors">
+                    Google Haritalar'da Aç
+                  </a>
                 </div>
               )}
-
-              <div className="mb-4">
-                <label className="block text-sm font-bold text-gray-700 mb-3">Adet Seçimi</label>
-                <div className="flex items-center justify-between border border-gray-200 p-2 rounded-2xl bg-gray-50 shadow-sm">
-                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-12 h-12 rounded-xl bg-white shadow-sm hover:bg-gray-100 flex items-center justify-center font-bold text-xl text-gray-700 transition-colors">-</button>
-                  <span className="font-extrabold text-2xl text-gray-900 w-12 text-center">{qty}</span>
-                  <button onClick={() => setQty(qty + 1)} className="w-12 h-12 rounded-xl bg-white shadow-sm hover:bg-gray-100 flex items-center justify-center font-bold text-xl text-gray-700 transition-colors">+</button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between mt-8 mb-8 bg-gray-50 p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="text-gray-500 font-bold">Toplam Tutar</div>
-                <div className="text-2xl font-extrabold text-orange-600">
-                  {total % 1 === 0 ? `${total.toFixed(0)} ₺` : `${total.toFixed(2)} ₺`}
-                </div>
-              </div>
-
-              <button 
-                onClick={handleBuyClick} 
-                className="w-full bg-gradient-to-r from-orange-600 to-pink-500 hover:from-orange-700 hover:to-pink-600 text-white py-4 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-2 shadow-xl shadow-pink-500/30 transition-all hover:scale-[1.02]"
-              >
-                <Ticket className="w-6 h-6" />
-                Bilet Satın Al
-              </button>
-              
-              <p className="text-xs text-center text-gray-400 font-medium mt-4">
-                Satın alma işlemi Bulbi Uygulaması üzerinden tamamlanacaktır.
-              </p>
-            </div>
-          </aside>
-          
+            </aside>
         </div>
+             {/* === BENZER ETKİNLİKLER: IZGARANIN DIŞINA ÇIKARILDI === */}
+        {similar && similar.length > 0 && (
+          <section className="mt-16 md:mt-24 border-t border-gray-200 pt-10 md:pt-16">
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 md:mb-10 text-center lg:text-left">Benzer Etkinlikler</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {similar.slice(0, 4).map((s: any) => (
+                <Link key={s.id} href={`/${s.locale || "tr"}/event/${s.id}`} className="group space-y-4">
+                  <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-gray-100">
+                    <Image src={s.thumbnail || s.images?.[0] || "/placeholder.png"} alt={s.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900 line-clamp-1 group-hover:text-pink-600 transition-colors text-base md:text-lg">{s.name}</h4>
+                    <p className="text-pink-600 font-extrabold mt-1 text-sm md:text-base">{formatPrice(s.price?.amount)}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
       </div>
+        {/* === YENİ: DAHA İNCE VE KİBAR YÜZEN SATIN ALMA BARI === */}
+      {/* - p-2.5 ve gap-2.5 gibi daha sıkı (compact) değerler kullanıldı 
+          - bottom-12 yapılarak Yardım butonunun hemen üstünde ama çok yukarıda da durmayacak şekilde sabitlendi */}
+      <div className="fixed bottom-12 xl:bottom-8 left-0 w-full z-[99990] pointer-events-none">
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="pointer-events-auto bg-gradient-to-r from-orange-500/95 to-orange-600/95 backdrop-blur-xl shadow-[0_10px_30px_-10px_rgba(249,115,22,0.5)] border border-orange-400/50 rounded-3xl p-2.5 sm:p-5 transition-all">
+            
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-4 w-full">
+              
+              {/* SOL: TARİH VE ADET SEÇİMİ */}
+              <div className="flex items-center gap-2 sm:gap-3 w-full lg:w-auto flex-1">
+                
+                {/* Tarih Seçici */}
+                {eventData?.eventDates && eventData.eventDates.length > 1 ? (
+                  <div className="relative flex-1 lg:max-w-[280px]">
+                    <div onClick={() => setIsDropdownOpen(!isDropdownOpen)} className={`bg-white/20 border ${isDropdownOpen ? 'border-white ring-2 ring-white/30' : 'border-white/30 hover:bg-white/30'} rounded-xl p-1.5 lg:p-3 px-3 flex justify-between items-center cursor-pointer transition-all`}>
+                      <div className="flex flex-col overflow-hidden">
+                        <span className="text-xs lg:text-base font-bold text-white truncate">{currentEventDate.day} {currentEventDate.month} {currentEventDate.year}</span>
+                        <span className="text-[9px] lg:text-xs text-orange-100 font-extrabold truncate">{currentEventDate.startTime || "Saat Belirtilmemiş"}</span>
+                      </div>
+                      <ChevronDown className={`w-3 h-3 lg:w-4 lg:h-4 text-white transition-transform shrink-0 ml-1 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                    </div>
+
+                    {/* YUKARI AÇILAN DROPDOWN */}
+                    {isDropdownOpen && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)}></div>
+                        <div className="absolute bottom-[calc(100%+0.75rem)] left-0 w-full min-w-[240px] lg:min-w-[260px] bg-white border border-gray-100 rounded-2xl lg:rounded-3xl shadow-[0_-15px_40px_-10px_rgba(0,0,0,0.15)] z-50 max-h-52 overflow-y-auto custom-scrollbar">
+                          {eventData.eventDates.map((date: any, index: number) => {
+                            const isSelected = selectedDateIndex === index;
+                            return (
+                              <div key={index} onClick={() => { setSelectedDateIndex(index); setIsDropdownOpen(false); }} className={`p-3 lg:p-4 border-b border-gray-50 last:border-0 cursor-pointer transition-all group flex items-center justify-between ${isSelected ? 'bg-orange-50' : 'hover:bg-gray-50'}`}>
+                                <div>
+                                  <div className={`font-bold text-xs sm:text-sm md:text-base transition-colors ${isSelected ? 'text-orange-600' : 'text-gray-800 group-hover:text-orange-600'}`}>
+                                    {date.day} {date.month} {date.year}
+                                  </div>
+                                  <div className="text-[10px] sm:text-xs text-gray-500 font-bold mt-0.5">{date.startTime || "Belirtilmemiş"}</div>
+                                </div>
+                                <div className={`w-4 h-4 lg:w-5 lg:h-5 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected ? 'border-orange-500 bg-orange-500' : 'border-gray-200 group-hover:border-orange-300'}`}>
+                                  {isSelected && <CheckCircle2 className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-white" />}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex-1 lg:max-w-[280px] flex flex-col justify-center px-2 lg:px-4 overflow-hidden">
+                    <span className="text-xs lg:text-base font-bold text-white truncate">{displayDate || "Tarih Belirtilmemiş"}</span>
+                    <span className="text-[9px] lg:text-xs text-orange-100 font-extrabold truncate">{displayTime}</span>
+                  </div>
+                )}
+
+                {/* Adet Seçici */}
+                <div className="flex items-center justify-between bg-white/20 border border-white/30 rounded-xl p-1 lg:p-1.5 shrink-0">
+                  <span className="text-[10px] lg:text-sm font-bold text-white mr-1.5 lg:mr-2 ml-1.5 lg:ml-3 hidden sm:block">Adet:</span>
+                  <div className="flex items-center">
+                    <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-6 h-6 lg:w-10 lg:h-10 rounded-md lg:rounded-xl bg-white shadow-sm flex items-center justify-center font-bold text-orange-600 active:scale-95 transition-transform">-</button>
+                    <span className="font-extrabold text-white w-6 lg:w-10 text-center text-xs lg:text-base">{qty}</span>
+                    <button onClick={() => setQty(qty + 1)} className="w-6 h-6 lg:w-10 lg:h-10 rounded-md lg:rounded-xl bg-white shadow-sm flex items-center justify-center font-bold text-orange-600 active:scale-95 transition-transform">+</button>
+                  </div>
+                </div>
+              </div>
+
+              {/* SAĞ: FİYAT VE BUTON */}
+              <div className="flex items-center justify-between lg:justify-end w-full lg:w-auto gap-3 lg:gap-8 pt-2 lg:pt-0 border-t border-white/20 lg:border-t-0">
+                <div className="flex flex-col ml-1 md:ml-0 shrink-0">
+                  <span className="text-[8px] lg:text-[10px] text-orange-100 font-bold uppercase tracking-wider mb-0.5">Toplam</span>
+                  <span className="text-base lg:text-3xl font-extrabold text-white leading-none">{total % 1 === 0 ? `${total.toFixed(0)} ₺` : `${total.toFixed(2)} ₺`}</span>
+                </div>
+
+                <div className="flex flex-col items-end shrink-0">
+                  <button onClick={handleBuyClick} className="bg-white text-orange-600 hover:bg-gray-50 px-4 sm:px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl font-extrabold text-xs sm:text-sm lg:text-lg flex items-center gap-1.5 sm:gap-2 shadow-lg shadow-orange-900/20 active:scale-95 transition-all whitespace-nowrap">
+                    <Ticket className="w-3.5 h-3.5 lg:w-5 lg:h-5 text-orange-500" />
+                    Hemen Satın Al
+                  </button>
+                  <span className="text-[7px] sm:text-[8px] lg:text-[10px] text-orange-100 font-medium mt-1 lg:mt-1.5 pr-1">*Uygulama üzerinden alınır.</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>      
 
       {/* QR MODALI */}
       {showQRModal && (
@@ -586,9 +537,11 @@ export function AppRedirectModal({ eventId, onClose }: { eventId: string; onClos
 
   if (!mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 backdrop-blur-md">
-      <div className="absolute inset-0 bg-black/60 transition-opacity" onClick={onClose} />
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[999999999] flex items-center justify-center px-4 backdrop-blur-md" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
+      <div className="absolute inset-0 bg-black/70 transition-opacity" onClick={onClose} />
       <div className="relative bg-white rounded-[2.5rem] w-full max-w-md p-8 md:p-10 shadow-2xl transform transition-all">
         <div className="flex flex-col items-center text-center">
 
@@ -630,10 +583,7 @@ export function AppRedirectModal({ eventId, onClose }: { eventId: string; onClos
 
               <p className="text-sm text-gray-400 font-medium mb-6">Telefonunuzun kamerasını açarak QR kodu okutun.</p>
 
-              <button
-                onClick={onClose}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-lg py-3 rounded-2xl transition-colors shadow-sm"
-              >
+              <button onClick={onClose} className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-base md:text-lg py-3 md:py-4 rounded-2xl transition-colors shadow-sm">
                 Vazgeç
               </button>
             </>
@@ -641,6 +591,7 @@ export function AppRedirectModal({ eventId, onClose }: { eventId: string; onClos
 
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -21,8 +21,8 @@ const EventCard = ({ data }: { data: any }) => {
   const locale = typeof window !== 'undefined' && window.location.pathname.startsWith('/en') ? 'en' : 'tr';
 
   return (
-    <div className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
-      <div className="relative h-48 w-full">
+    <div className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+      <div className="relative h-48 w-full shrink-0">
         <Image src={data.thumbnail || data.images?.[0] || "/placeholder.png"} alt={data.name || "Etkinlik Görseli"} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover" />
         <div className={`absolute top-4 left-4 px-3 py-1.5 rounded-lg text-xs font-bold text-white ${theme.badgeBg} flex items-center gap-1.5`}>
           {isOnline ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
@@ -30,16 +30,19 @@ const EventCard = ({ data }: { data: any }) => {
         </div>
       </div>
 
-      <div className="p-5">
-        <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2">{data.name}</h3>
+       <div className="p-5 flex flex-col flex-grow">
+        
+        <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 min-h-[3.5rem]">
+          {data.name}
+        </h3>
 
         <div className="space-y-2 mb-5">
-          <div className="flex items-center text-sm text-gray-600">
+          {/*<div className="flex items-center text-sm text-gray-600">
             <div className={`p-1.5 rounded-md ${theme.lightBg} mr-2.5`}>
               <Calendar className={`w-4 h-4 ${theme.text}`} />
             </div>
             <span>{data.startDate ? new Date(data.startDate).toLocaleDateString("tr-TR") : t('noDate')}</span>
-          </div>
+          </div>*/}
           <div className="flex items-center text-sm text-gray-600">
             <div className={`p-1.5 rounded-md ${theme.lightBg} mr-2.5`}>
               <Users className={`w-4 h-4 ${theme.text}`} />
@@ -48,7 +51,7 @@ const EventCard = ({ data }: { data: any }) => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
+        <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
           <div className="flex flex-col">
             <span className="text-xs text-gray-400 font-medium mb-0.5">{t('perPerson')}</span>
             <span className={`text-xl font-bold ${theme.text}`}>

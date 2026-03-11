@@ -148,12 +148,12 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-5 right-5 z-50">
+      <div className="fixed bottom-3 right-5 z-50">
         <Link 
           href="/yardim" 
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg transition-all transform hover:scale-105 text-sm font-semibold"
+          className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg transition-all transform hover:scale-105 text-xs font-semibold"
         >
-          <HelpCircle className="w-4 h-4" />
+          <HelpCircle className="w-3 h-3" />
           <span>{t('helpBtn')}</span>
         </Link>
       </div>
