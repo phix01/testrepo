@@ -57,7 +57,7 @@ export default function InitProvider() {
           model: 'browser',
           osType,
           osVersion: navigator.platform || 'browser',
-          pushNotificationToken: '',
+          pushNotificationToken: 'web-placeholder-token',
           language,
           appVersion: 1,
           idfa: '',
