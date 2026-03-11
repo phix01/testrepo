@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bulbi – Deep Link Test (Android)</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;padding:24px}
+    .card{max-width:680px;margin:auto;border:1px solid #eee;border-radius:12px;padding:20px;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+    .btn{display:inline-block;padding:12px 16px;border-radius:10px;border:1px solid #ddd;text-decoration:none}
+    .primary{background:#0b74ff;color:#fff;border-color:#0b74ff}
+    .muted{color:#666;font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Bulbi – Deep Link (Android)</h2>
+    <p id="status" class="muted">Hazır</p>
+    <button id="openApp" class="btn primary">Uygulamada Aç</button>
+    <a id="openStore" class="btn" href="https://play.google.com/store/apps/details?id=com.sheydo.bulbi">Play Store</a>
+    <p class="muted" style="margin-top:12px">Not: Lütfen Chrome gibi gerçek tarayıcıda (Instagram/FB in-app webview yerine) test edin.</p>
+  </div>
+
+  <script>
+  (function () {
+    // Değiştirin: test etmek istediğiniz etkinlik id'sini buraya koyun
+    var EVENT_ID = "68e3c3f62f246d0435117b38";
+
+    var PLAY_STORE = "https://play.google.com/store/apps/details?id=com.sheydo.bulbi";
+    var SCHEME_URL = "bulbi://event/" + EVENT_ID;
+    // intent URI: host olarak bulbi.co kullanıyoruz (uygulamanın intent-filter'ı buna göre tanımlıysa çalışır)
+    var INTENT_URL = "intent://bulbi.co/event/" + EVENT_ID + "#Intent;scheme=https;package=com.sheydo.bulbi;S.browser_fallback_url=" + encodeURIComponent(PLAY_STORE) + ";end";
+
+    var statusEl = document.getElementById("status");
+    var openBtn = document.getElementById("openApp");
+    var openStore = document.getElementById("openStore");
+
+    function tryOpenAndroid() {
+      statusEl.textContent = "Uygulamaya yönlendiriliyor (intent)...";
+
+      var handled = false;
+      var onVisibility = function () { handled = document.hidden; };
+      document.addEventListener('visibilitychange', onVisibility);
+
+      // 1) İlk deneme: intent:// (en güvenli Android yolu)
+      try { window.location = INTENT_URL; } catch (e) { }
+
+      // 2) Eğer intent başarısızsa, 600ms sonra custom scheme deneyelim
+      var schemeTimer = setTimeout(function () {
+        try { window.location = SCHEME_URL; } catch (e) { }
+      }, 600);
+
+      // 3) 1500ms içinde görünürlük değişmedi ise Play Store'a gönder
+      var storeTimer = setTimeout(function () {
+        document.removeEventListener('visibilitychange', onVisibility);
+        clearTimeout(schemeTimer);
+        if (!handled) {
+          statusEl.textContent = "Uygulama görünmedi, Play Store'a yönlendiriliyor...";
+          try { window.location = PLAY_STORE; } catch (e) { }
+        } else {
+          statusEl.textContent = "Uygulama açıldı.";
+        }
+      }, 1500);
+    }
+
+    openBtn.addEventListener('click', function (e) { e.preventDefault(); tryOpenAndroid(); });
+
+    // Otomatik tetikleme istenirse yorum satırını kaldırın (NOT: in-app webview'lerde engellenebilir)
+    // if (/Android/i.test(navigator.userAgent) && !(/instagram/i.test(document.referrer))) { tryOpenAndroid(); }
+
+  })();
+  </script>
+</body>
+</html>

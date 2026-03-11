@@ -1,0 +1,23 @@
+[
+    {
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.sheydo.bulbi.dev",
+            "sha256_cert_fingerprints": [
+                "36:D3:B4:EF:D1:6C:ED:23:A4:10:B2:EB:D2:6A:12:63:16:52:2C:92:F0:EE:65:AE:E1:53:BD:95:7E:8C:49:10",
+                "80:F1:25:61:B7:ED:ED:61:CA:E8:41:25:A7:6B:8E:0A:99:8B:B3:47:0E:C3:0D:5F:D1:C3:0D:F7:FC:CF:81:E4"
+            ]
+        }
+    },
+    {
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.sheydo.bulbi",
+            "sha256_cert_fingerprints": [
+                "E6:18:7C:4A:4C:6B:4A:D7:80:3A:E5:ED:3C:9F:1E:4C:69:03:DC:10:36:9E:A0:0F:66:83:55:A8:FB:D9:27:B4"
+            ]
+        }
+    }
+]
