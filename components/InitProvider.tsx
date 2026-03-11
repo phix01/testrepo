@@ -60,7 +60,7 @@ export default function InitProvider() {
           pushNotificationToken: 'web-placeholder-token',
           language,
           appVersion: 1,
-          idfa: '',
+          idfa: 'web-placeholder-idfa',
         },
       };
 
