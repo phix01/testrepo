@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { tryOpenEventDeepLink, tryOpenEventDeepLinkAndroid } from "@/components/DeepLinkHandler";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import {
   getEventDetail,
@@ -48,8 +48,7 @@ export default function EventDetail({ eventId }: Props) {
   const [qty, setQty] = useState(1);
   const [similar, setSimilar] = useState<any[]>([]);
   const [showQRModal, setShowQRModal] = useState(false);
-  const [triedDeepLink, setTriedDeepLink] = useState(false);
-  
+
   // YENİ: Seçili tarihin index'ini tutan state ve Dropdown durumu
   const [selectedDateIndex, setSelectedDateIndex] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -79,49 +78,6 @@ export default function EventDetail({ eventId }: Props) {
       mounted = false;
     };
   }, [eventId]);
-
-  // Otomatik deeplink denemesi: sayfa açıldığında (eventData gelmeden) mobilde uygulamayı dene
-  useEffect(() => {
-    try {
-      if (!triedDeepLink && eventId) {
-        const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
-        const isAndroid = /Android/i.test(ua);
-        if (isAndroid) {
-          // Delegate to centralized Android helper (intent:// -> bulbi:// -> Play Store with 0ms/800ms timings)
-          tryOpenEventDeepLinkAndroid(eventId);
-          setTriedDeepLink(true);
-        } else {
-          // Non-Android: only perform iOS-specific scheme -> App Store fallback.
-          const uaNon = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
-          const isIOS = /iPhone|iPad|iPod/i.test(uaNon);
-
-          if (isIOS) {
-            const appStore = 'https://apps.apple.com/tr/app/bulbi-%C3%A7ocuk-etkinlikleri/id6749323823';
-            let handled = false;
-            const onVisibility = () => { handled = document.hidden; };
-            document.addEventListener('visibilitychange', onVisibility);
-
-            try {
-              // Try custom scheme directly on iOS
-              window.location.href = `bulbi://event/${eventId}`;
-            } catch (_) {}
-
-            // After 1000ms, if app didn't open, go to App Store
-            const storeTimer = window.setTimeout(() => {
-              try {
-                if (!handled) window.location.href = appStore;
-              } catch (_) {}
-              document.removeEventListener('visibilitychange', onVisibility);
-              clearTimeout(storeTimer);
-            }, 1000);
-          }
-
-          // Do not redirect on desktop; mark as tried to avoid reattempts
-          setTriedDeepLink(true);
-        }
-      }
-    } catch (err) {}
-  }, [triedDeepLink, eventId]);
 
   if (loading) {
     return (
@@ -504,40 +460,117 @@ export default function EventDetail({ eventId }: Props) {
 // UYGULAMAYA YÖNLENDİREN QR MODAL BİLEŞENİ
 export function AppRedirectModal({ eventId, onClose }: { eventId: string; onClose: () => void }) {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=bulbi://event/${eventId}`;
+  const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const ua = navigator.userAgent || navigator.vendor || '';
+    if (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua)) setIsMobile(true);
+    return () => { setMounted(false); };
+  }, []);
+
+  const handleMobileRedirect = () => {
+    const userAgent = navigator.userAgent || navigator.vendor || '';
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
+    const isAndroid = /android/i.test(userAgent);
+
+    if (isIOS) {
+      const appStoreUrl = "https://apps.apple.com/tr/app/bulbi-%C3%A7ocuk-etkinlikleri/id6749323823";
+
+      try {
+        window.location.href = `bulbi://event/${eventId}`;
+      } catch (e) {}
+
+      const onVisibility = () => {};
+      document.addEventListener('visibilitychange', onVisibility);
+
+      const fallback = window.setTimeout(() => {
+        try {
+          if (!document.hidden) window.location.href = appStoreUrl;
+        } catch (e) {}
+        document.removeEventListener('visibilitychange', onVisibility);
+        clearTimeout(fallback);
+      }, 2500);
+    } else if (isAndroid) {
+      const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sheydo.bulbi';
+      const intentUrl = `intent://event/${eventId}#Intent;scheme=bulbi;package=com.sheydo.bulbi;end;`;
+
+      // Try intent first
+      window.location.href = intentUrl;
+
+      // If app didn't open within 2.5s, fallback to Play Store
+      const fallbackTimer = setTimeout(() => {
+        if (!document.hidden) {
+          window.location.href = playStoreUrl;
+        }
+      }, 2500);
+
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          clearTimeout(fallbackTimer);
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange, { once: true });
+    }
+  };
+
+  if (!mounted) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 backdrop-blur-md">
       <div className="absolute inset-0 bg-black/60 transition-opacity" onClick={onClose} />
       <div className="relative bg-white rounded-[2.5rem] w-full max-w-md p-8 md:p-10 shadow-2xl transform transition-all">
         <div className="flex flex-col items-center text-center">
-          
+
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center mb-6 shadow-inner">
             <Smartphone className="w-10 h-10 text-pink-500" />
           </div>
-          
+
           <h3 className="text-2xl font-extrabold text-gray-900 mb-2">Uygulamadan Devam Et</h3>
           <p className="text-gray-500 font-medium mb-6">
             Bilet satın alma işlemlerine hızlı ve güvenli bir şekilde <strong className="text-pink-600">Bulbi</strong> mobil uygulamasından devam edebilirsin.
           </p>
 
-          <div className="bg-white p-4 rounded-3xl border-2 border-dashed border-gray-200 inline-block mb-8 relative group">
-            <div className="absolute -inset-2 bg-gradient-to-r from-orange-500 to-pink-500 rounded-3xl opacity-0 group-hover:opacity-20 blur transition-opacity"></div>
-            <img src={qrUrl} alt="App Yönlendirme QR Kodu" className="w-48 h-48 object-contain relative z-10 rounded-xl" />
-            <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-              <ScanLine className="w-16 h-16 text-pink-500/20" />
-            </div>
-          </div>
+          {isMobile ? (
+            // Mobile: show only the button that triggers deeplink
+            <>
+              <button
+                onClick={handleMobileRedirect}
+                className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold text-lg py-4 rounded-2xl transition-all shadow-lg mb-4"
+              >
+                Uygulamayı Aç / İndir
+              </button>
+              <button
+                onClick={onClose}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-lg py-3 rounded-2xl transition-colors shadow-sm"
+              >
+                Vazgeç
+              </button>
+            </>
+          ) : (
+            // Desktop: show QR code and instructions
+            <>
+              <div className="bg-white p-4 rounded-3xl border-2 border-dashed border-gray-200 inline-block mb-6 relative group">
+                <div className="absolute -inset-2 bg-gradient-to-r from-orange-500 to-pink-500 rounded-3xl opacity-0 group-hover:opacity-20 blur transition-opacity"></div>
+                <img src={qrUrl} alt="App Yönlendirme QR Kodu" className="w-48 h-48 object-contain relative z-10 rounded-xl" />
+                <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                  <ScanLine className="w-16 h-16 text-pink-500/20" />
+                </div>
+              </div>
 
-          <p className="text-sm text-gray-400 font-medium mb-6">
-            Telefonunuzun kamerasını açarak QR kodu okutun.
-          </p>
+              <p className="text-sm text-gray-400 font-medium mb-6">Telefonunuzun kamerasını açarak QR kodu okutun.</p>
 
-          <button 
-            onClick={onClose} 
-            className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-lg py-4 rounded-2xl transition-colors shadow-sm"
-          >
-            Vazgeç
-          </button>
+              <button
+                onClick={onClose}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-lg py-3 rounded-2xl transition-colors shadow-sm"
+              >
+                Vazgeç
+              </button>
+            </>
+          )}
+
         </div>
       </div>
     </div>
