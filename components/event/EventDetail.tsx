@@ -214,13 +214,8 @@ export default function EventDetail({ eventId }: Props) {
         {/* === ÜST KISIM: RESİM VE ANA BİLGİ KARTI YAN YANA === */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mb-8 items-stretch">
           
-          {/* SOL TARAFTAKİ RESİM */}
           <div className="lg:col-span-5 bg-white rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 p-4 md:p-6 flex items-center justify-center min-h-[300px] md:min-h-[350px]">
-            <img 
-              src={banner} 
-              alt={eventData?.name || "Etkinlik Görseli"} 
-              className="w-full h-full max-h-[350px] md:max-h-[450px] object-contain rounded-xl"
-            />
+            <img src={banner} alt={eventData?.name} className="w-full h-full max-h-[350px] md:max-h-[450px] object-contain rounded-xl" />
           </div>
 
           {/* SAĞ TARAFTAKİ ANA BİLGİ KARTI */}
