@@ -87,44 +87,36 @@ export default function EventDetail({ eventId }: Props) {
         const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
         const isAndroid = /Android/i.test(ua);
         if (isAndroid) {
-          // Inline intent flow (match deeplink-android.html): try intent:// then fallback to Play Store after 1.5s
-          const vendor = typeof navigator !== 'undefined' ? navigator.vendor || '' : '';
-          const platform = typeof navigator !== 'undefined' ? (navigator as any).platform || '' : '';
-          const detectAndroid = () => /Android/i.test(ua || vendor || platform);
-          const playStore = 'https://play.google.com/store/apps/details?id=com.sheydo.bulbi';
-          const intentUrl = `intent://bulbi.co/event/${eventId}#Intent;scheme=https;package=com.sheydo.bulbi;S.browser_fallback_url=${encodeURIComponent(playStore)};end`;
-
-          let handled = false;
-          const onVisibility = () => { handled = document.hidden; };
-          document.addEventListener('visibilitychange', onVisibility);
-
-          try {
-            window.location.href = intentUrl;
-          } catch (_) {}
-
-          const schemeTimer = window.setTimeout(() => {
-            try {
-              // also try custom scheme as a secondary fallback
-              window.location.href = `bulbi://event/${eventId}`;
-            } catch (_) {}
-          }, 600);
-
-          const storeTimer = window.setTimeout(() => {
-            try {
-              if (!handled) {
-                // Android branch: always go to Play Store as fallback
-                window.location.href = playStore;
-              }
-            } catch (_) {}
-            document.removeEventListener('visibilitychange', onVisibility);
-            clearTimeout(schemeTimer);
-            clearTimeout(storeTimer);
-          }, 1500);
-
+          // Delegate to centralized Android helper (intent:// -> bulbi:// -> Play Store with 0ms/800ms timings)
+          tryOpenEventDeepLinkAndroid(eventId);
           setTriedDeepLink(true);
         } else {
-          // Non-Android: use universal→scheme→store flow via helper immediately
-          tryOpenEventDeepLink(eventId);
+          // Non-Android: only perform iOS-specific scheme -> App Store fallback.
+          const uaNon = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+          const isIOS = /iPhone|iPad|iPod/i.test(uaNon);
+
+          if (isIOS) {
+            const appStore = 'https://apps.apple.com/tr/app/bulbi-%C3%A7ocuk-etkinlikleri/id6749323823';
+            let handled = false;
+            const onVisibility = () => { handled = document.hidden; };
+            document.addEventListener('visibilitychange', onVisibility);
+
+            try {
+              // Try custom scheme directly on iOS
+              window.location.href = `bulbi://event/${eventId}`;
+            } catch (_) {}
+
+            // After 1000ms, if app didn't open, go to App Store
+            const storeTimer = window.setTimeout(() => {
+              try {
+                if (!handled) window.location.href = appStore;
+              } catch (_) {}
+              document.removeEventListener('visibilitychange', onVisibility);
+              clearTimeout(storeTimer);
+            }, 1000);
+          }
+
+          // Do not redirect on desktop; mark as tried to avoid reattempts
           setTriedDeepLink(true);
         }
       }

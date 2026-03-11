@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="apple-itunes-app" content="app-id=6749323823">
+  <title>Bulbi – Deep Link Test (iOS)</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;padding:24px}
+    .card{max-width:680px;margin:auto;border:1px solid #eee;border-radius:12px;padding:20px;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+    .btn{display:inline-block;padding:12px 16px;border-radius:10px;border:1px solid #ddd;text-decoration:none}
+    .primary{background:#000;color:#fff;border-color:#000}
+    .muted{color:#666;font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Bulbi – Deep Link (iOS)</h2>
+    <p id="status" class="muted">Hazır</p>
+    <button id="openApp" class="btn primary">Uygulamada Aç</button>
+    <a id="openStore" class="btn" href="https://apps.apple.com/tr/app/bulbi-%C3%A7ocuk-etkinlikleri/id6749323823">App Store</a>
+  </div>
+
+  <script>
+  (function () {
+    // Değiştirin: test etmek istediğiniz etkinlik id'sini buraya koyun
+    var EVENT_ID = "68d27dfe0cba8e4328f57be6";
+    var UNIVERSAL_URL = "https://bulbi.co/event/" + EVENT_ID;
+    var SCHEME_URL = "bulbi://event/" + EVENT_ID;
+    var APP_STORE_URL = "https://apps.apple.com/tr/app/bulbi-%C3%A7ocuk-etkinlikleri/id6749323823";
+
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPhone|iPad|iPod/i.test(ua);
+    var isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
+    var fromInstagram = (document.referrer || "").toLowerCase().includes("instagram");
+    var statusEl = document.getElementById("status");
+
+    function tryOpenApp() {
+      statusEl.textContent = "Uygulama açılıyor: " + UNIVERSAL_URL;
+
+      var handled = false;
+      var onVisibility = function () { if (document.hidden) handled = true; };
+      document.addEventListener('visibilitychange', onVisibility);
+
+      // 1) Try universal link first (will open app on iOS if AASA + entitlements are set)
+      try { window.location = UNIVERSAL_URL; } catch (e) {}
+
+      // 2) Immediately also try custom scheme as fallback
+      setTimeout(function () { try { window.location = SCHEME_URL; } catch (e) {} }, 0);
+
+      // 3) If not opened within 800ms, go to App Store
+      setTimeout(function () {
+        document.removeEventListener('visibilitychange', onVisibility);
+        if (!handled) {
+          statusEl.textContent = "Uygulama görünmedi, App Store'a yönlendiriliyor...";
+          try { window.location = APP_STORE_URL; } catch (e) {}
+        } else {
+          statusEl.textContent = "Uygulama açıldı.";
+        }
+      }, 800);
+    }
+
+    document.getElementById('openApp').addEventListener('click', function (e) {
+      e.preventDefault(); tryOpenApp();
+    });
+
+    // Otomatik tetikleme (isteğe bağlı): Instagram vb. in-app webview'lerinde otomatik açma sıkıntılı olabilir
+    if (isMobile && fromInstagram) { tryOpenApp(); }
+
+  })();
+  </script>
+</body>
+</html>

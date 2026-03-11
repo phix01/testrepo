@@ -64,30 +64,26 @@ export function tryOpenDeepLink(path: string) {
       return;
     }
 
-    // Non-Android: use universal-first (iOS relies on AASA -> Associated Domains)
-    const universalUrl = `${universalBase}${cleanedPath}`;
-    let handled = false;
-    const onVisibilityChange = () => { if (document.hidden) handled = true; };
-    document.addEventListener('visibilitychange', onVisibilityChange);
+    // Non-Android: Do not open universal links. For iOS try custom scheme then App Store; on desktop do nothing.
+    const isIos = detectIOS();
 
-    try {
-      window.location.href = universalUrl;
-    } catch (e) {}
+    if (isIos) {
+      let handled = false;
+      const onVisibilityChange = () => { if (document.hidden) handled = true; };
+      document.addEventListener('visibilitychange', onVisibilityChange);
 
-    const schemeTimer = window.setTimeout(() => {
-      try { window.location.href = schemeUrl; } catch (_) {}
-    }, 0);
-
-    const storeTimer = window.setTimeout(() => {
       try {
-        if (!handled) {
-          window.location.href = detectIOS() ? appStore : playStore;
-        }
-      } catch (_) {}
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      clearTimeout(schemeTimer);
-      clearTimeout(storeTimer);
-    }, 800);
+        // Try custom scheme immediately on iOS
+        window.location.href = schemeUrl;
+      } catch (e) {}
+
+      // If not opened within 1000ms, go to App Store
+      const storeTimer = window.setTimeout(() => {
+        try { if (!handled) window.location.href = appStore; } catch (_) {}
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+        clearTimeout(storeTimer);
+      }, 1000);
+    }
   } catch (err) {
     // ignore
   }
