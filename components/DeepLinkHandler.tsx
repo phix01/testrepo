@@ -12,44 +12,76 @@ export function tryOpenDeepLink(path: string) {
 
     const universalBase = 'https://bulbi.co/';
     const cleanedPath = String(path).replace(/^\/+/, '');
-    const universalUrl = `${universalBase}${cleanedPath}`;
-
-    // Sequence to improve reliability in different environments:
-    // 1) Navigate to the universal HTTPS link (https://bulbi.co/...).
-    // 2) After a short delay, try the custom scheme (bulbi://...) as a fallback.
-    // 3) On Android try intent:// if available.
-    // 4) If none opened the app, after 1.5s redirect to the store.
-
     const schemeUrl = `bulbi://${cleanedPath}`;
-    const intentUrl = `intent://${cleanedPath}#Intent;scheme=https;package=com.sheydo.bulbi;S.browser_fallback_url=${encodeURIComponent(playStore)};end`;
 
+    // Android-first: prefer different sequences per browser to avoid opening an intermediate web page
+    if (detectAndroid()) {
+      const intentUrl = `intent://bulbi.co/${cleanedPath}#Intent;scheme=https;package=com.sheydo.bulbi;S.browser_fallback_url=${encodeURIComponent(playStore)};end`;
+      const isEdge = /Edg\//i.test(ua || '');
+
+      let handled = false;
+      const onVisibilityChange = () => { if (document.hidden) handled = true; };
+      document.addEventListener('visibilitychange', onVisibilityChange);
+
+      if (isEdge) {
+        // Edge on Android: try custom scheme first (bulbi://...), then intent://, then Play Store
+        try {
+          window.location.href = schemeUrl;
+        } catch (e) {}
+
+        const intentTimer = window.setTimeout(() => {
+          try { window.location.href = intentUrl; } catch (_) {}
+        }, 600);
+
+        const storeTimer = window.setTimeout(() => {
+          try { if (!handled) window.location.href = playStore; } catch (_) {}
+          document.removeEventListener('visibilitychange', onVisibilityChange);
+          clearTimeout(intentTimer);
+          clearTimeout(storeTimer);
+        }, 1500);
+
+        return;
+      }
+
+      // Default Android path (non-Edge): intent:// first, then scheme, then Play Store
+      try {
+        window.location.href = intentUrl;
+      } catch (e) {}
+
+      // Secondary fallback: try custom scheme after short delay
+      const schemeTimer = window.setTimeout(() => {
+        try { window.location.href = schemeUrl; } catch (_) {}
+      }, 600);
+
+      // If not opened within 1.5s, go to Play Store
+      const storeTimer = window.setTimeout(() => {
+        try { if (!handled) window.location.href = playStore; } catch (_) {}
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+        clearTimeout(schemeTimer);
+        clearTimeout(storeTimer);
+      }, 1500);
+
+      return;
+    }
+
+    // Non-Android: use universal-first (iOS relies on AASA -> Associated Domains)
+    const universalUrl = `${universalBase}${cleanedPath}`;
     let handled = false;
     const onVisibilityChange = () => { if (document.hidden) handled = true; };
     document.addEventListener('visibilitychange', onVisibilityChange);
 
     try {
-      // 1) Universal link
       window.location.href = universalUrl;
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
 
-    // 2) After 600ms try custom scheme (some browsers block instant scheme attempts)
     const schemeTimer = window.setTimeout(() => {
-      try {
-        // Try custom scheme (bulbi://...)
-        window.location.href = schemeUrl;
-      } catch (err) {
-        // ignore
-      }
+      try { window.location.href = schemeUrl; } catch (_) {}
     }, 600);
 
-    // 3) If still not opened, after 1.5s go to store
     const storeTimer = window.setTimeout(() => {
       try {
         if (!handled) {
-          const isAnd = detectAndroid();
-          window.location.href = isAnd ? playStore : appStore;
+          window.location.href = detectIOS() ? appStore : playStore;
         }
       } catch (_) {}
       document.removeEventListener('visibilitychange', onVisibilityChange);
