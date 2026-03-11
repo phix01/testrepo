@@ -482,16 +482,20 @@ export function AppRedirectModal({ eventId, onClose }: { eventId: string; onClos
         window.location.href = `bulbi://event/${eventId}`;
       } catch (e) {}
 
-      const onVisibility = () => {};
-      document.addEventListener('visibilitychange', onVisibility);
-
-      const fallback = window.setTimeout(() => {
+      // Fallback timer to App Store after 2.5s if app didn't open
+      const fallbackTimer = window.setTimeout(() => {
         try {
           if (!document.hidden) window.location.href = appStoreUrl;
         } catch (e) {}
-        document.removeEventListener('visibilitychange', onVisibility);
-        clearTimeout(fallback);
       }, 2500);
+
+      const handleVisibility = () => {
+        if (document.hidden) {
+          clearTimeout(fallbackTimer);
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibility, { once: true });
     } else if (isAndroid) {
       const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sheydo.bulbi';
       const intentUrl = `intent://event/${eventId}#Intent;scheme=bulbi;package=com.sheydo.bulbi;end;`;
