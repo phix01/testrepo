@@ -208,19 +208,23 @@ export default function EventDetail({ eventId }: Props) {
     : "-";
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-40 pt-28 md:pt-40">
+    <div className="bg-gray-50 min-h-screen pb-20 pt-28 md:pt-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* === ÜST KISIM: RESİM VE ANA BİLGİ KARTI YAN YANA === */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mb-8 items-stretch">
           
           {/* SOL TARAFTAKİ RESİM */}
-          <div className="lg:col-span-5 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6 flex items-center justify-center min-h-[350px]">
-            <img src={banner} alt={eventData?.name} className="w-full h-full max-h-[350px] md:max-h-[450px] object-contain rounded-xl" />
+          <div className="lg:col-span-5 bg-white rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 p-4 md:p-6 flex items-center justify-center min-h-[300px] md:min-h-[350px]">
+            <img 
+              src={banner} 
+              alt={eventData?.name || "Etkinlik Görseli"} 
+              className="w-full h-full max-h-[350px] md:max-h-[450px] object-contain rounded-xl"
+            />
           </div>
 
           {/* SAĞ TARAFTAKİ ANA BİLGİ KARTI */}
-          <div className="lg:col-span-7 bg-white rounded-[2.5rem] shadow-xl p-8 md:p-10 border border-gray-100 flex flex-col justify-center">
+          <div className="lg:col-span-7 bg-white rounded-3xl md:rounded-[2.5rem] shadow-xl p-6 md:p-10 border border-gray-100 flex flex-col justify-center">
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
               
               <div className="flex flex-wrap items-center gap-2">
@@ -245,46 +249,46 @@ export default function EventDetail({ eventId }: Props) {
 
             </div>
             
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
               {eventData?.name}
             </h1>
             
             {eventData?.organization?.name && (
-              <div className="text-lg text-gray-500 font-medium flex items-center gap-2">
+               <div className="text-base md:text-lg text-gray-500 font-medium flex items-center gap-2">
                 <span>Düzenleyen:</span>
                 <span className="text-pink-600 font-bold">{eventData.organization.name}</span>
               </div>
             )}
 
             {/* BİLGİ KUTULARI (Dinamik Seçili Tarih) */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mt-8 md:mt-10">
               <div className="flex items-center gap-4 p-4 rounded-2xl bg-pink-100 border border-gray-100">
-                <div className="w-12 h-12 rounded-full bg-pink-200 flex items-center justify-center shrink-0">
-                  <Calendar className="w-6 h-6 text-pink-600" />
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-pink-200 flex items-center justify-center shrink-0">
+                  <Calendar className="w-5 h-5 md:w-6 md:h-6 text-pink-600" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-pink-600 uppercase tracking-wider">Tarih</div>
-                  <div className="font-bold text-gray-800 transition-all">{displayDate || "-"}</div>
+                  <div className="text-[10px] md:text-xs font-bold text-pink-600 uppercase tracking-wider">Tarih</div>
+                  <div className="font-bold text-gray-800 transition-all text-sm md:text-base">{displayDate || "-"}</div>
                 </div>
               </div>
 
               <div className="flex items-center gap-4 p-4 rounded-2xl bg-blue-100 border border-gray-100">
-                <div className="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center shrink-0">
-                  <Clock className="w-6 h-6 text-blue-600" />
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-200 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-blue-600 uppercase tracking-wider">Saat</div>
-                  <div className="font-bold text-gray-800 transition-all">{displayTime}</div>
+                  <div className="text-[10px] md:text-xs font-bold text-blue-600 uppercase tracking-wider">Saat</div>
+                  <div className="font-bold text-gray-800 transition-all text-sm md:text-base">{displayTime}</div>
                 </div>
               </div>
 
               <div className="flex items-center gap-4 p-4 rounded-2xl bg-orange-100 border border-gray-100">
-                <div className="w-12 h-12 rounded-full bg-orange-200 flex items-center justify-center shrink-0">
-                  <Clock className="w-6 h-6 text-orange-600" />
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-orange-200 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5 md:w-6 md:h-6 text-orange-600" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-orange-600 uppercase tracking-wider">Süre</div>
-                  <div className="font-bold text-gray-800">{eventData?.duration || "Tek Oturum"}</div>
+                  <div className="text-[10px] md:text-xs font-bold text-orange-600 uppercase tracking-wider">Süre</div>
+                  <div className="font-bold text-gray-800 text-sm md:text-base">{eventData?.duration || "Tek Oturum"}</div>
                 </div>
               </div>
             </div>
@@ -296,23 +300,24 @@ export default function EventDetail({ eventId }: Props) {
           
           {/* SOL TARAF: AÇIKLAMA VE KONUM */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-[2.5rem] shadow-sm p-8 md:p-10 border border-gray-100 h-full">
+             {/* ETKİNLİK AÇIKLAMASI BÖLÜMÜ */}
+            <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-gray-100">
               <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 border-b pb-4">
                 Etkinlik Hakkında
               </h2>
-              <div className="prose prose-base md:prose-lg prose-pink max-w-none text-gray-600 leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: eventData?.description || "Bu etkinlik için açıklama girilmemiştir." }} />
+              <div className="prose prose-base md:prose-lg prose-pink max-w-none text-gray-600 leading-relaxed whitespace-pre-wrap"  dangerouslySetInnerHTML={{ __html: eventData?.description || "Bu etkinlik için açıklama girilmemiştir." }} />
             </div>
 
             {isOnline ? (
-              <div className="bg-white rounded-[2.5rem] shadow-sm p-8 md:p-8 border border-gray-100">
-                <h3 className="text-2xl font-extrabold text-gray-900 mb-6">Katılım Bilgileri</h3>
-                 <div className="flex flex-col gap-4">
+               <div className="bg-white rounded-3xl md:rounded-[2.5rem] shadow-sm p-6 md:p-10 border border-gray-100">
+                <h3 className="text-xl md:text-2xl font-extrabold text-gray-900 mb-6">Katılım Bilgileri</h3>
+                <div className="flex flex-col sm:flex-row items-start gap-4">
                   <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                     <Video className="w-7 h-7 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-lg text-gray-800 font-bold mb-2">Bu etkinlik çevrim içi (online) gerçekleştirilecektir.</p>
-                    <p className="text-gray-600">Katılım bağlantısı ve detaylar, biletinizi satın aldıktan sonra e-posta adresinize gönderilecektir.</p>
+                     <p className="text-base md:text-lg text-gray-800 font-bold mb-1">Bu etkinlik çevrim içi (online) gerçekleştirilecektir.</p>
+                    <p className="text-sm md:text-base text-gray-600">Katılım bağlantısı ve detaylar, biletinizi satın aldıktan sonra e-posta adresinize gönderilecektir.</p>
                   </div>
                 </div>
               </div>
@@ -322,14 +327,14 @@ export default function EventDetail({ eventId }: Props) {
             {/* Sağda gösterilecek Konum kartı (aside) */}
             <aside className="lg:col-span-1">
               {!isOnline && eventData?.address && (
-                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                 <div className="bg-white rounded-3xl md:rounded-[2.5rem] shadow-sm p-6 md:p-10 border border-gray-100">
                   <h3 className="text-xl md:text-2xl font-extrabold text-gray-900 mb-6">Konum</h3>
                   <div className="flex items-start gap-3 mb-4">
                     <MapPin className="w-5 h-5 text-orange-600 shrink-0 mt-1" />
                     <p className="text-base md:text-lg text-gray-700 font-medium leading-relaxed">{eventData.address}</p>
                   </div>
 
-                  <div className="w-full h-40 rounded-xl overflow-hidden border border-gray-200 shadow-inner mb-4">
+                  <div className="w-full h-48 md:h-80 rounded-2xl md:rounded-3xl overflow-hidden border border-gray-200 shadow-inner relative">
                     <iframe width="100%" height="100%" frameBorder="0" loading="lazy" className="w-full h-full" src={`https://maps.google.com/maps?q=${encodeURIComponent(eventData.address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`} />
                   </div>
 

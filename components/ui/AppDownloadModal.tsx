@@ -28,10 +28,22 @@ export default function AppDownloadModal() {
     return () => window.removeEventListener("openAppDownloadModal", handler as EventListener);
   }, []);
 
+   // Arka Plan Kaydırma Kilidi
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-[99999999] flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
 
       <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 mx-4 text-center">
