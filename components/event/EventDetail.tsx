@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import {
@@ -78,6 +78,59 @@ export default function EventDetail({ eventId }: Props) {
       mounted = false;
     };
   }, [eventId]);
+
+  // Otomatik deeplink: sayfa açılıp `eventData` yüklendiğinde sadece mobilde tetikle
+  const autoDeepLinkTried = useRef(false);
+  useEffect(() => {
+    if (autoDeepLinkTried.current) return;
+    if (!eventData) return;
+
+    const ua = navigator.userAgent || navigator.vendor || '';
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+    const isAndroid = /android/i.test(ua);
+
+    if (!isIOS && !isAndroid) return; // desktop: do nothing
+
+    autoDeepLinkTried.current = true;
+
+    // iOS flow: scheme -> 2500ms -> App Store
+    if (isIOS) {
+      const appStoreUrl = "https://apps.apple.com/tr/app/bulbi-%C3%A7ocuk-etkinlikleri/id6749323823";
+      try { window.location.href = `bulbi://event/${eventId}`; } catch (e) {}
+
+      const storeTimer = window.setTimeout(() => {
+        try { if (!document.hidden) window.location.href = appStoreUrl; } catch (e) {}
+      }, 2500);
+
+      const onVis = () => { if (document.hidden) clearTimeout(storeTimer); };
+      document.addEventListener('visibilitychange', onVis, { once: true });
+    }
+
+    // Android flow: intent -> 1500ms scheme -> 2500ms Play Store
+    if (isAndroid) {
+      const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sheydo.bulbi';
+      const intentUrl = `intent://bulbi.co/event/${eventId}#Intent;scheme=https;package=com.sheydo.bulbi;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
+
+      try { window.location.href = intentUrl; } catch (e) {}
+
+      const schemeTimer = window.setTimeout(() => {
+        try { window.location.href = `bulbi://event/${eventId}`; } catch (e) {}
+      }, 1500);
+
+      const storeTimer = window.setTimeout(() => {
+        try { if (!document.hidden) window.location.href = playStoreUrl; } catch (e) {}
+      }, 2500);
+
+      const onVis = () => {
+        if (document.hidden) {
+          clearTimeout(schemeTimer);
+          clearTimeout(storeTimer);
+        }
+      };
+
+      document.addEventListener('visibilitychange', onVis, { once: true });
+    }
+  }, [eventData, eventId]);
 
   if (loading) {
     return (
