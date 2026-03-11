@@ -100,7 +100,7 @@ export default function EventDetail({ eventId }: Props) {
 
       const storeTimer = window.setTimeout(() => {
         try { if (!document.hidden) window.location.href = appStoreUrl; } catch (e) {}
-      }, 800);
+      }, 2500);
 
       const onVis = () => { if (document.hidden) clearTimeout(storeTimer); };
       document.addEventListener('visibilitychange', onVis, { once: true });
