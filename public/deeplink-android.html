@@ -29,38 +29,30 @@
     var PLAY_STORE = "https://play.google.com/store/apps/details?id=com.sheydo.bulbi";
     var SCHEME_URL = "bulbi://event/" + EVENT_ID;
     // intent URI: host olarak bulbi.co kullanıyoruz (uygulamanın intent-filter'ı buna göre tanımlıysa çalışır)
-    var INTENT_URL = "intent://bulbi.co/event/" + EVENT_ID + "#Intent;scheme=https;package=com.sheydo.bulbi;S.browser_fallback_url=" + encodeURIComponent(PLAY_STORE) + ";end";
+    var SCHEME_URL = "bulbi://event/" + EVENT_ID;
 
     var statusEl = document.getElementById("status");
     var openBtn = document.getElementById("openApp");
     var openStore = document.getElementById("openStore");
 
     function tryOpenAndroid() {
-      statusEl.textContent = "Uygulamaya yönlendiriliyor (intent)...";
+      statusEl.textContent = "Uygulamaya yönlendiriliyor...";
 
       var handled = false;
       var onVisibility = function () { handled = document.hidden; };
       document.addEventListener('visibilitychange', onVisibility);
 
-      // 1) İlk deneme: intent:// (en güvenli Android yolu)
-      try { window.location = INTENT_URL; } catch (e) { }
+      try { window.location = SCHEME_URL; } catch (e) { }
 
-      // 2) Eğer intent başarısızsa, 600ms sonra custom scheme deneyelim
-      var schemeTimer = setTimeout(function () {
-        try { window.location = SCHEME_URL; } catch (e) { }
-      }, 600);
-
-      // 3) 1500ms içinde görünürlük değişmedi ise Play Store'a gönder
       var storeTimer = setTimeout(function () {
         document.removeEventListener('visibilitychange', onVisibility);
-        clearTimeout(schemeTimer);
         if (!handled) {
           statusEl.textContent = "Uygulama görünmedi, Play Store'a yönlendiriliyor...";
           try { window.location = PLAY_STORE; } catch (e) { }
         } else {
           statusEl.textContent = "Uygulama açıldı.";
         }
-      }, 1500);
+      }, 4000);
     }
 
     openBtn.addEventListener('click', function (e) { e.preventDefault(); tryOpenAndroid(); });
