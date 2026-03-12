@@ -38,7 +38,7 @@ export function tryOpenDeepLink(path: string) {
           document.removeEventListener('visibilitychange', onVisibilityChange);
           clearTimeout(intentTimer);
           clearTimeout(storeTimer);
-        }, 800);
+        }, 4000);
 
         return;
       }
@@ -59,7 +59,7 @@ export function tryOpenDeepLink(path: string) {
         document.removeEventListener('visibilitychange', onVisibilityChange);
         clearTimeout(schemeTimer);
         clearTimeout(storeTimer);
-      }, 800);
+      }, 4000);
 
       return;
     }
@@ -119,7 +119,7 @@ export function tryOpenEventDeepLinkAndroid(id: string) {
       } catch (_) {}
       document.removeEventListener('visibilitychange', onVisibilityChange);
       clearTimeout(storeTimer);
-    }, 800);
+    }, 4000);
   } catch (err) {
     // ignore
   }
@@ -148,7 +148,7 @@ export function tryOpenBlogDeepLinkAndroid(id: string) {
       try { if (!handled) window.location.href = playStore; } catch (_) {}
       document.removeEventListener('visibilitychange', onVisibilityChange);
       clearTimeout(storeTimer);
-    }, 800);
+    }, 4000);
   } catch (err) {}
 }
 
@@ -175,7 +175,7 @@ export function tryOpenOrganizationDeepLinkAndroid(id: string) {
       try { if (!handled) window.location.href = playStore; } catch (_) {}
       document.removeEventListener('visibilitychange', onVisibilityChange);
       clearTimeout(storeTimer);
-    }, 800);
+    }, 4000);
   } catch (err) {}
 }
 

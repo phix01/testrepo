@@ -517,12 +517,12 @@ export function AppRedirectModal({ eventId, onClose }: { eventId: string; onClos
         } catch (e) {}
       }, 1500);
 
-      // 3) After 2.5s fallback to Play Store (in case intent+scheme both didn't open)
+      // 3) After 4s fallback to Play Store (in case intent+scheme both didn't open)
       const storeTimer = window.setTimeout(() => {
         try {
           if (!document.hidden) window.location.href = playStoreUrl;
         } catch (e) {}
-      }, 2500);
+      }, 4000);
 
       const handleVisibility = () => {
         if (document.hidden) {
